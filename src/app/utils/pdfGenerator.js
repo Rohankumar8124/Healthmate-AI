@@ -7,214 +7,293 @@ export async function generatePrescriptionPDF(diagnosis, patientName = 'Patient'
 
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 20;
+    const contentWidth = pageWidth - 2 * margin;
     let y = 20;
 
-    // Helper functions
-    const addText = (text, x, fontSize = 10, style = 'normal', color = [0, 0, 0]) => {
-        doc.setFontSize(fontSize);
-        doc.setFont('helvetica', style);
-        doc.setTextColor(...color);
-        doc.text(text, x, y);
-    };
+    // Colors
+    const pistachio = [147, 197, 114];
+    const pistachioLight = [238, 245, 233];
+    const darkGray = [40, 40, 40];
+    const mediumGray = [100, 100, 100];
+    const lightGray = [180, 180, 180];
 
-    const addLine = () => {
-        doc.setDrawColor(200, 200, 200);
-        doc.line(margin, y, pageWidth - margin, y);
-        y += 5;
-    };
-
-    const checkPage = (needed = 40) => {
-        if (y + needed > 280) {
+    // Helper to check page break
+    const checkPage = (needed = 30) => {
+        if (y + needed > 270) {
             doc.addPage();
             y = 20;
         }
     };
 
-    // Header with accent color
-    doc.setFillColor(147, 197, 114); // Pistachio
-    doc.rect(0, 0, pageWidth, 35, 'F');
+    // ========== HEADER ==========
+    doc.setFillColor(...pistachio);
+    doc.rect(0, 0, pageWidth, 40, 'F');
 
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(24);
+    doc.setFontSize(26);
     doc.setFont('helvetica', 'bold');
-    doc.text('MediCare AI', margin, 22);
+    doc.text('MediCare AI', margin, 25);
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('AI-Powered Health Assessment Report', margin, 34);
+
+    y = 55;
+
+    // ========== PATIENT INFO BOX ==========
+    doc.setFillColor(248, 249, 250);
+    doc.roundedRect(margin, y - 5, contentWidth, 28, 3, 3, 'F');
 
     doc.setFontSize(10);
+    doc.setTextColor(...mediumGray);
     doc.setFont('helvetica', 'normal');
-    doc.text('AI-Powered Health Assessment Report', margin, 30);
 
-    y = 50;
-
-    // Patient & Date Info
-    doc.setFillColor(248, 249, 250);
-    doc.rect(margin, y - 5, pageWidth - 2 * margin, 25, 'F');
-
-    addText('Patient:', margin + 5, 10, 'bold', [100, 100, 100]);
-    y += 0;
-    doc.text(patientName, margin + 30, y);
-
-    doc.text('Date:', pageWidth - 80, y);
-    doc.text(new Date().toLocaleDateString('en-US', {
-        year: 'numeric', month: 'long', day: 'numeric'
-    }), pageWidth - 60, y);
-
-    y += 10;
-    doc.text('Report ID:', margin + 5, y);
-    doc.text(`MCA-${Date.now().toString(36).toUpperCase()}`, margin + 35, y);
-
-    y += 20;
-
-    // Assessment Level
-    checkPage();
-    doc.setFillColor(
-        data.urgencyLevel === 'low' ? 238 : data.urgencyLevel === 'medium' ? 254 : 254,
-        data.urgencyLevel === 'low' ? 245 : data.urgencyLevel === 'medium' ? 243 : 226,
-        data.urgencyLevel === 'low' ? 233 : data.urgencyLevel === 'medium' ? 226 : 226
-    );
-    doc.rect(margin, y - 5, pageWidth - 2 * margin, 20, 'F');
-
-    addText('Assessment Level:', margin + 5, 11, 'bold', [60, 60, 60]);
-    y += 0;
-    const levelColor = data.urgencyLevel === 'low' ? [90, 138, 61] :
-        data.urgencyLevel === 'medium' ? [184, 134, 92] : [185, 92, 92];
-    doc.setTextColor(...levelColor);
+    // Row 1
+    doc.text('Patient:', margin + 8, y + 5);
+    doc.setTextColor(...darkGray);
     doc.setFont('helvetica', 'bold');
-    doc.text(data.urgencyLevel?.toUpperCase() || 'N/A', margin + 55, y);
+    doc.text(patientName, margin + 35, y + 5);
+
+    doc.setTextColor(...mediumGray);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Date:', margin + 110, y + 5);
+    doc.setTextColor(...darkGray);
+    doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), margin + 125, y + 5);
+
+    // Row 2
+    y += 12;
+    doc.setTextColor(...mediumGray);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Report ID:', margin + 8, y + 5);
+    doc.setTextColor(...darkGray);
+    doc.text(`MCA-${Date.now().toString(36).toUpperCase()}`, margin + 38, y + 5);
+
+    y += 25;
+
+    // ========== ASSESSMENT LEVEL ==========
+    const urgencyLevel = data.urgencyLevel || 'low';
+    const urgencyColor = urgencyLevel === 'low' ? [90, 138, 61] :
+        urgencyLevel === 'medium' ? [180, 130, 70] : [180, 70, 70];
+    const urgencyBg = urgencyLevel === 'low' ? pistachioLight :
+        urgencyLevel === 'medium' ? [254, 243, 226] : [254, 230, 230];
+
+    doc.setFillColor(...urgencyBg);
+    doc.roundedRect(margin, y - 5, contentWidth, 35, 3, 3, 'F');
+
+    doc.setFontSize(11);
+    doc.setTextColor(...mediumGray);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Assessment Level:', margin + 8, y + 6);
+
+    doc.setTextColor(...urgencyColor);
+    doc.setFontSize(14);
+    doc.text(urgencyLevel.toUpperCase(), margin + 55, y + 6);
 
     if (data.overallAssessment) {
-        y += 10;
-        doc.setTextColor(80, 80, 80);
-        doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
-        const lines = doc.splitTextToSize(data.overallAssessment, pageWidth - 2 * margin - 10);
-        doc.text(lines, margin + 5, y);
-        y += lines.length * 5;
+        doc.setTextColor(...mediumGray);
+        doc.setFont('helvetica', 'normal');
+        const assessmentLines = doc.splitTextToSize(data.overallAssessment, contentWidth - 16);
+        doc.text(assessmentLines, margin + 8, y + 18);
     }
 
-    y += 15;
+    y += 45;
 
-    // Possible Conditions
+    // ========== POSSIBLE CONDITIONS ==========
     if (data.possibleConditions?.length > 0) {
-        checkPage();
-        addText('POSSIBLE CONDITIONS', margin, 12, 'bold', [147, 197, 114]);
-        y += 3;
-        addLine();
+        checkPage(50);
+
+        doc.setFontSize(12);
+        doc.setTextColor(...pistachio);
+        doc.setFont('helvetica', 'bold');
+        doc.text('POSSIBLE CONDITIONS', margin, y);
+
+        doc.setDrawColor(...lightGray);
+        doc.line(margin, y + 3, pageWidth - margin, y + 3);
+        y += 12;
 
         data.possibleConditions.forEach((cond, i) => {
             checkPage(25);
-            addText(`${i + 1}. ${cond.name}`, margin, 11, 'bold', [30, 30, 30]);
+
+            doc.setFontSize(11);
+            doc.setTextColor(...darkGray);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${i + 1}. ${cond.name}`, margin + 4, y);
+
             if (cond.probability) {
+                const probWidth = doc.getTextWidth(`${i + 1}. ${cond.name}`);
                 doc.setFontSize(9);
-                doc.setTextColor(100, 100, 100);
-                doc.text(`(${cond.probability} probability)`, margin + doc.getTextWidth(`${i + 1}. ${cond.name}`) + 5, y);
+                doc.setTextColor(...mediumGray);
+                doc.setFont('helvetica', 'italic');
+                doc.text(`(${cond.probability} probability)`, margin + 8 + probWidth, y);
             }
+
             y += 6;
+
             if (cond.description) {
                 doc.setFontSize(9);
-                doc.setTextColor(80, 80, 80);
-                const lines = doc.splitTextToSize(cond.description, pageWidth - 2 * margin - 5);
-                doc.text(lines, margin + 5, y);
-                y += lines.length * 4 + 5;
+                doc.setTextColor(...mediumGray);
+                doc.setFont('helvetica', 'normal');
+                const descLines = doc.splitTextToSize(cond.description, contentWidth - 12);
+                doc.text(descLines, margin + 8, y);
+                y += descLines.length * 4 + 6;
             }
         });
         y += 5;
     }
 
-    // Suggested Medicines
+    // ========== SUGGESTED MEDICINES ==========
     if (data.suggestedMedicines?.length > 0) {
-        checkPage(50);
-        addText('SUGGESTED MEDICINES', margin, 12, 'bold', [147, 197, 114]);
-        y += 3;
-        addLine();
+        checkPage(60);
 
-        data.suggestedMedicines.forEach((med, i) => {
-            checkPage(35);
+        doc.setFontSize(12);
+        doc.setTextColor(...pistachio);
+        doc.setFont('helvetica', 'bold');
+        doc.text('SUGGESTED MEDICINES', margin, y);
+
+        doc.setDrawColor(...lightGray);
+        doc.line(margin, y + 3, pageWidth - margin, y + 3);
+        y += 12;
+
+        data.suggestedMedicines.forEach((med) => {
+            checkPage(40);
 
             // Medicine box
             doc.setFillColor(252, 252, 252);
             doc.setDrawColor(230, 230, 230);
-            doc.roundedRect(margin, y - 3, pageWidth - 2 * margin, 28, 3, 3, 'FD');
+            doc.roundedRect(margin, y - 4, contentWidth, 32, 2, 2, 'FD');
 
-            addText(`${med.name}`, margin + 5, 11, 'bold', [30, 30, 30]);
+            // Medicine name
+            doc.setFontSize(11);
+            doc.setTextColor(...darkGray);
+            doc.setFont('helvetica', 'bold');
+            doc.text(med.name, margin + 6, y + 4);
+
+            // OTC/Prescription badge
             doc.setFontSize(8);
-            doc.setTextColor(147, 197, 114);
-            doc.text(med.type || 'OTC', pageWidth - margin - 20, y);
+            doc.setTextColor(...(med.type === 'OTC' ? pistachio : [180, 130, 70]));
+            doc.text(med.type || 'OTC', pageWidth - margin - 20, y + 4);
 
-            y += 7;
+            // Details row 1
+            y += 10;
             doc.setFontSize(9);
-            doc.setTextColor(80, 80, 80);
-            doc.text(`Dosage: ${med.dosage}`, margin + 5, y);
-            doc.text(`Frequency: ${med.frequency}`, margin + 80, y);
+            doc.setTextColor(...mediumGray);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Dosage: ${med.dosage}`, margin + 6, y + 3);
+            doc.text(`Frequency: ${med.frequency}`, margin + 80, y + 3);
 
-            y += 5;
-            doc.text(`Duration: ${med.duration}`, margin + 5, y);
+            // Details row 2
+            y += 6;
+            doc.text(`Duration: ${med.duration}`, margin + 6, y + 3);
 
+            // Warning
             if (med.warnings) {
-                y += 5;
-                doc.setTextColor(180, 100, 80);
+                y += 6;
+                doc.setTextColor(180, 100, 70);
                 doc.setFontSize(8);
-                const warnLines = doc.splitTextToSize(`⚠ ${med.warnings}`, pageWidth - 2 * margin - 15);
-                doc.text(warnLines, margin + 5, y);
+                const warnText = `⚠ ${med.warnings}`;
+                const warnLines = doc.splitTextToSize(warnText, contentWidth - 16);
+                doc.text(warnLines, margin + 6, y + 3);
                 y += warnLines.length * 3;
             }
 
-            y += 12;
+            y += 14;
         });
         y += 5;
     }
 
-    // Home Remedies
+    // ========== HOME REMEDIES ==========
     if (data.homeRemedies?.length > 0) {
         checkPage(40);
-        addText('HOME REMEDIES', margin, 12, 'bold', [147, 197, 114]);
-        y += 3;
-        addLine();
+
+        doc.setFontSize(12);
+        doc.setTextColor(...pistachio);
+        doc.setFont('helvetica', 'bold');
+        doc.text('HOME REMEDIES', margin, y);
+
+        doc.setDrawColor(...lightGray);
+        doc.line(margin, y + 3, pageWidth - margin, y + 3);
+        y += 12;
 
         data.homeRemedies.forEach((rem) => {
             checkPage(20);
-            addText(`• ${rem.remedy}`, margin, 10, 'bold', [50, 50, 50]);
+
+            doc.setFontSize(10);
+            doc.setTextColor(...darkGray);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`• ${rem.remedy}`, margin + 4, y);
             y += 5;
+
             doc.setFontSize(9);
-            doc.setTextColor(80, 80, 80);
-            const lines = doc.splitTextToSize(rem.instructions, pageWidth - 2 * margin - 10);
-            doc.text(lines, margin + 8, y);
-            y += lines.length * 4 + 5;
+            doc.setTextColor(...mediumGray);
+            doc.setFont('helvetica', 'normal');
+            const instrLines = doc.splitTextToSize(rem.instructions, contentWidth - 16);
+            doc.text(instrLines, margin + 10, y);
+            y += instrLines.length * 4 + 6;
         });
         y += 5;
     }
 
-    // When to See Doctor
-    if (data.whenToSeeDoctor) {
-        checkPage(30);
-        doc.setFillColor(254, 243, 226);
-        doc.rect(margin, y - 3, pageWidth - 2 * margin, 25, 'F');
+    // ========== LIFESTYLE ==========
+    if (data.lifestyle?.length > 0) {
+        checkPage(40);
 
-        addText('⚠ WHEN TO SEEK MEDICAL ATTENTION', margin + 5, 10, 'bold', [184, 134, 92]);
-        y += 6;
-        doc.setFontSize(9);
-        doc.setTextColor(100, 80, 60);
-        const lines = doc.splitTextToSize(data.whenToSeeDoctor, pageWidth - 2 * margin - 15);
-        doc.text(lines, margin + 5, y);
-        y += lines.length * 4 + 15;
+        doc.setFontSize(12);
+        doc.setTextColor(...pistachio);
+        doc.setFont('helvetica', 'bold');
+        doc.text('LIFESTYLE RECOMMENDATIONS', margin, y);
+
+        doc.setDrawColor(...lightGray);
+        doc.line(margin, y + 3, pageWidth - margin, y + 3);
+        y += 12;
+
+        data.lifestyle.slice(0, 5).forEach((item, i) => {
+            checkPage(10);
+
+            doc.setFontSize(9);
+            doc.setTextColor(...darkGray);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`${i + 1}. ${item}`, margin + 6, y);
+            y += 6;
+        });
+        y += 5;
     }
 
-    // Disclaimer Footer
-    checkPage(40);
-    y = Math.max(y + 10, 250);
-    doc.setDrawColor(200, 200, 200);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 8;
+    // ========== WHEN TO SEE DOCTOR ==========
+    if (data.whenToSeeDoctor) {
+        checkPage(35);
 
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    const disclaimer = 'DISCLAIMER: This AI-generated report is for informational purposes only. It is not a medical diagnosis and should not replace professional medical advice. Always consult a qualified healthcare provider for proper diagnosis and treatment.';
-    const discLines = doc.splitTextToSize(disclaimer, pageWidth - 2 * margin);
-    doc.text(discLines, margin, y);
+        doc.setFillColor(254, 243, 226);
+        doc.roundedRect(margin, y - 4, contentWidth, 25, 2, 2, 'F');
 
-    y += discLines.length * 3 + 5;
+        doc.setFontSize(10);
+        doc.setTextColor(180, 130, 70);
+        doc.setFont('helvetica', 'bold');
+        doc.text('⚠ WHEN TO SEEK MEDICAL ATTENTION', margin + 6, y + 4);
+
+        y += 8;
+        doc.setFontSize(9);
+        doc.setTextColor(100, 80, 60);
+        doc.setFont('helvetica', 'normal');
+        const doctorLines = doc.splitTextToSize(data.whenToSeeDoctor, contentWidth - 16);
+        doc.text(doctorLines, margin + 6, y + 4);
+        y += 25;
+    }
+
+    // ========== FOOTER ==========
+    const footerY = 275;
+    doc.setDrawColor(...lightGray);
+    doc.line(margin, footerY - 10, pageWidth - margin, footerY - 10);
+
+    doc.setFontSize(7);
+    doc.setTextColor(...lightGray);
+    doc.setFont('helvetica', 'normal');
+    const disclaimer = 'DISCLAIMER: This AI-generated report is for informational purposes only. It is not a medical diagnosis. Always consult a healthcare provider.';
+    doc.text(disclaimer, margin, footerY - 3);
+
     doc.setFontSize(9);
-    doc.setTextColor(147, 197, 114);
-    doc.text('Generated by MediCare AI', pageWidth / 2, y, { align: 'center' });
+    doc.setTextColor(...pistachio);
+    doc.text('Generated by MediCare AI', pageWidth / 2, footerY + 5, { align: 'center' });
 
     return doc;
 }
