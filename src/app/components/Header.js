@@ -36,10 +36,7 @@ export default function Header() {
                     </SignedOut>
 
                     <SignedIn>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-700 font-semibold">
-                                Hi, <span className="text-[#93c572] font-bold">{user?.firstName || 'there'}</span>
-                            </span>
+                        <div className="flex items-center gap-3">
                             <UserButton
                                 afterSignOutUrl="/"
                                 appearance={{
@@ -50,6 +47,9 @@ export default function Header() {
                                     }
                                 }}
                             />
+                            <span className="hidden sm:inline text-sm text-gray-600">
+                                Hi, <span className="text-[#93c572] font-semibold">{user?.firstName || 'there'}</span>
+                            </span>
                         </div>
                     </SignedIn>
                 </div>

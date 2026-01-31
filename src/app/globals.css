@@ -252,7 +252,6 @@ body {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
 }
 
 .symptom-checkbox:hover {
@@ -263,17 +262,8 @@ body {
 .symptom-checkbox.selected {
   background: var(--pistachio-pale);
   border-color: var(--pistachio);
-}
-
-.symptom-checkbox.selected::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background: var(--pistachio);
-  border-radius: 12px 0 0 12px;
+  border-width: 2px;
+  padding: 15px 19px;
 }
 
 .checkbox-icon {
