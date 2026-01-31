@@ -1,10 +1,78 @@
 import { NextResponse } from 'next/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
+import connectDB from '@/app/lib/mongodb';
+import Report from '@/app/models/Report';
+import { saveReportToDatabase } from './saveReport';
+
+export async function GET() {
+    try {
+        const { userId } = await auth();
+
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const db = await connectDB();
+        if (!db) {
+            return NextResponse.json({
+                success: true,
+                reports: [],
+                message: 'Database not configured'
+            });
+        }
+
+        // Get user email from Clerk
+        const user = await currentUser();
+        const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+
+        if (!userEmail) {
+            return NextResponse.json({
+                success: true,
+                reports: [],
+                message: 'User email not found'
+            });
+        }
+
+        // Fetch diagnosis reports from MediCare_Admin collection matching user email
+        const mongoose = await import('mongoose');
+        const collection = mongoose.connection.db.collection('MediCare_Admin');
+        const diagnosisReports = await collection
+            .find({
+                type: 'diagnosis_report',
+                userEmail: userEmail
+            })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .toArray();
+
+        return NextResponse.json({
+            success: true,
+            reports: diagnosisReports.map(report => ({
+                id: report._id.toString(),
+                symptoms: report.symptoms,
+                additionalInfo: report.additionalInfo,
+                diagnosis: report.diagnosis,
+                urgencyLevel: report.urgencyLevel,
+                createdAt: report.createdAt,
+            })),
+        });
+
+    } catch (error) {
+        console.error('Error fetching reports:', error);
+        return NextResponse.json(
+            { error: 'Failed to fetch reports', details: error.message },
+            { status: 500 }
+        );
+    }
+}
+
 
 export async function POST(request) {
     try {
         const { symptoms, additionalInfo } = await request.json();
 
         const apiKey = process.env.GEMINI_API_KEY;
+
 
         if (!apiKey) {
             // Return accurate mock data based on symptoms
@@ -16,7 +84,7 @@ export async function POST(request) {
 
         const prompt = `You are an AI medical assistant. Analyze the following symptoms carefully and provide an accurate health assessment.
 
-SYMPTOMS REPORTED:
+SYMPTOMS REPORTED (${symptoms.length} total):
 ${symptoms.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
 ${additionalInfo ? `ADDITIONAL INFORMATION FROM PATIENT:\n${additionalInfo}` : ''}
@@ -62,59 +130,99 @@ Respond ONLY in this exact JSON format (no markdown, no code blocks):
   "lifestyle": ["Specific lifestyle recommendations"],
   "whenToSeeDoctor": "Specific warning signs to watch for",
   "urgencyLevel": "low/medium/high/emergency",
-  "overallAssessment": "A 2-3 sentence summary of the assessment based on symptom pattern"
+  "overallAssessment": "A 2-3 sentence summary referencing the ${symptoms.length} symptoms analyzed",
+  "analysisDetails": {
+    "symptomCount": ${symptoms.length},
+    "patternsIdentified": ["identified", "patterns"],
+    "urgencyScore": 0-10
+  }
 }`;
 
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
+                    generationConfig: { temperature: 0.4, maxOutputTokens: 8192 },
                 }),
             }
         );
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('❌ Gemini API Error Details:', JSON.stringify(errorData, null, 2));
-            console.error('❌ Status:', response.status, response.statusText);
-            throw new Error(`API request failed: ${errorData?.error?.message || response.statusText}`);
+            console.error('❌ Gemini API Error - Falling back to rule-based system');
+            console.error('❌ Error:', errorData?.error?.message || response.statusText);
+            // Fall back to rule-based system instead of failing
+            return NextResponse.json({ ...generateAccurateResponse(symptoms, additionalInfo), source: 'fallback' });
         }
 
         const data = await response.json();
         const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (!textContent) {
-            throw new Error('No content in response');
+            console.log('⚠️ No content in Gemini response - Falling back to rule-based system');
+            return NextResponse.json({ ...generateAccurateResponse(symptoms, additionalInfo), source: 'fallback' });
         }
+
+        // console.log('🔍 Raw Gemini Response:', textContent.substring(0, 200) + '...'); // Debug logging
 
         let parsedResponse;
         try {
-            const cleanedText = textContent.replace(/```json\n?|\n?```/g, '').trim();
-            parsedResponse = JSON.parse(cleanedText);
-        } catch {
-            console.log('⚠️ Gemini API response parsing failed - Falling back to rule-based system');
-            return NextResponse.json(generateAccurateResponse(symptoms, additionalInfo));
+            // rigorous cleanup: remove markdown, find the first { and last }
+            const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+            const jsonString = jsonMatch ? jsonMatch[0] : textContent;
+            parsedResponse = JSON.parse(jsonString);
+        } catch (e) {
+            console.log('⚠️ Gemini API response parsing failed:', e.message);
+            console.log('📝 Raw Text that failed parsing:', textContent);
+            return NextResponse.json({ ...generateAccurateResponse(symptoms, additionalInfo), source: 'fallback' });
         }
 
-        return NextResponse.json({
+        // Add analysisDetails if not present from Gemini
+        if (!parsedResponse.analysisDetails) {
+            parsedResponse.analysisDetails = {
+                symptomCount: symptoms.length,
+                patternsIdentified: [],
+                urgencyScore: parsedResponse.urgencyLevel === 'emergency' ? 10 :
+                    parsedResponse.urgencyLevel === 'high' ? 7 :
+                        parsedResponse.urgencyLevel === 'medium' ? 4 : 2
+            };
+        }
+
+        // Save report to database
+        const responseData = {
             success: true,
             data: parsedResponse,
             symptomCount: symptoms.length,
             source: 'gemini',
             disclaimer: "This is AI-generated health information. Always consult a qualified healthcare provider for proper diagnosis and treatment."
+        };
+
+        // Try to save to database (non-blocking)
+        saveReportToDatabase(symptoms, additionalInfo, parsedResponse).catch(err => {
+            console.error('Failed to save report to database:', err.message);
         });
 
+        return NextResponse.json(responseData);
+
     } catch (error) {
-        console.error('❌ GEMINI API ERROR:', error.message);
-        console.log('⚠️ Falling back to rule-based system due to API error');
-        return NextResponse.json(generateAccurateResponse(
-            (await request.json().catch(() => ({}))).symptoms || [],
-            ''
-        ));
+        console.error('❌ UNEXPECTED ERROR:', error.message);
+        // Try to return fallback - if symptoms is defined
+        try {
+            const body = await request.clone().json().catch(() => ({}));
+            if (body.symptoms?.length > 0) {
+                console.log('⚠️ Falling back to rule-based system');
+                return NextResponse.json({ ...generateAccurateResponse(body.symptoms, body.additionalInfo || ''), source: 'fallback' });
+            }
+        } catch { }
+
+        return NextResponse.json({
+            success: false,
+            message: 'Failed to analyze symptoms. Please try again.',
+            error: error.message
+        }, { status: 500 });
     }
 }
 

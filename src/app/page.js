@@ -6,6 +6,8 @@ import Header from './components/Header';
 import SymptomChecker from './components/SymptomChecker';
 import DiagnosisResult from './components/DiagnosisResult';
 import MedicineSchedule from './components/MedicineSchedule';
+import NearbyHospitals from './components/NearbyHospitals';
+import PreviousReports from './components/PreviousReports';
 import NotificationToast from './components/NotificationToast';
 
 export default function Home() {
@@ -182,7 +184,7 @@ export default function Home() {
             {/* Tab Navigation */}
             <div className="flex justify-center mb-8 slide-up slide-up-delay-1">
               <div className="tab-nav">
-                {['symptoms', 'results', 'schedule'].map((tab) => (
+                {['symptoms', 'results', 'schedule', 'reports', 'hospitals'].map((tab) => (
                   <button
                     key={tab}
                     className={`tab-item ${activeTab === tab ? 'active' : ''}`}
@@ -193,6 +195,8 @@ export default function Home() {
                       {tab === 'symptoms' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>}
                       {tab === 'results' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                       {tab === 'schedule' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                      {tab === 'reports' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>}
+                      {tab === 'hospitals' && <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
                       {tab}
                       {tab === 'schedule' && schedules.length > 0 && (
                         <span className="bg-white/30 px-2 py-0.5 rounded-full text-xs">{schedules.length}</span>
@@ -253,21 +257,29 @@ export default function Home() {
                   notificationPermission={notificationPermission}
                 />
               )}
+              {activeTab === 'reports' && (
+                <PreviousReports />
+              )}
+              {activeTab === 'hospitals' && (
+                <NearbyHospitals />
+              )}
             </div>
 
-            {/* Footer */}
-            <footer className="mt-12">
-              <div className="card p-5 max-w-2xl mx-auto">
-                <div className="flex items-start gap-4">
-                  <div className="icon-box icon-box-warning flex-shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            {/* Footer - hide on results tab since DiagnosisResult has its own disclaimer */}
+            {activeTab !== 'results' && (
+              <footer className="mt-12">
+                <div className="card p-5 max-w-2xl mx-auto">
+                  <div className="flex items-start gap-4">
+                    <div className="icon-box icon-box-warning flex-shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      <span className="font-medium text-gray-700">Disclaimer:</span> This AI provides general health information only. Always consult a qualified healthcare provider for diagnosis and treatment.
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-500">
-                    <span className="font-medium text-gray-700">Disclaimer:</span> This AI provides general health information only. Always consult a qualified healthcare provider for diagnosis and treatment.
-                  </p>
                 </div>
-              </div>
-            </footer>
+              </footer>
+            )}
           </SignedIn>
         </div>
       </main>
