@@ -136,10 +136,10 @@ export default function Home() {
                   </svg>
                 </div>
               </div>
-              <h1 className="text-4xl md:text-5xl font-semibold text-gray-800 mb-4">
+              <h1 className="text-4xl md:text-5xl font-semibold text-gray-800 dark:text-white mb-4">
                 Your AI <span className="gradient-text">Health Assistant</span>
               </h1>
-              <p className="text-gray-500 text-lg max-w-xl mx-auto mb-8">
+              <p className="text-gray-500 dark:text-gray-400 text-lg max-w-xl mx-auto mb-8">
                 Describe your symptoms, get personalized health insights, medicine suggestions, and manage your health schedule—all powered by AI.
               </p>
               <div className="flex justify-center">
@@ -164,8 +164,8 @@ export default function Home() {
                 ].map((f, i) => (
                   <div key={i} className="card p-6 slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
                     <span className="text-3xl mb-3 block">{f.icon}</span>
-                    <h3 className="font-semibold text-gray-800 mb-1">{f.title}</h3>
-                    <p className="text-sm text-gray-500">{f.desc}</p>
+                    <h3 className="font-semibold text-gray-800 dark:text-white mb-1">{f.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{f.desc}</p>
                   </div>
                 ))}
               </div>
@@ -175,10 +175,10 @@ export default function Home() {
           {/* Main app for signed in users */}
           <SignedIn>
             <header className="text-center mb-10 slide-up">
-              <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-2">
+              <h1 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-white mb-2">
                 Medi<span className="gradient-text">Care</span> AI
               </h1>
-              <p className="text-gray-500">Describe your symptoms and receive personalized health insights</p>
+              <p className="text-gray-500 dark:text-gray-400">Describe your symptoms and receive personalized health insights</p>
             </header>
 
             {/* Tab Navigation */}
@@ -215,8 +215,8 @@ export default function Home() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-800">Enable Reminders</p>
-                    <p className="text-sm text-gray-500">Get notified for your medicine schedule</p>
+                    <p className="font-medium text-gray-800 dark:text-white">Enable Reminders</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Get notified for your medicine schedule</p>
                   </div>
                 </div>
                 <button onClick={requestNotificationPermission} className="btn btn-primary text-sm py-2.5 px-5">Enable</button>
@@ -273,8 +273,8 @@ export default function Home() {
                     <div className="icon-box icon-box-warning flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium text-gray-700">Disclaimer:</span> This AI provides general health information only. Always consult a qualified healthcare provider for diagnosis and treatment.
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Disclaimer:</span> This AI provides general health information only. Always consult a qualified healthcare provider for diagnosis and treatment.
                     </p>
                   </div>
                 </div>

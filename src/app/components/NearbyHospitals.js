@@ -125,14 +125,14 @@ export default function NearbyHospitals() {
             <div className="card p-6">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-xl font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2 flex items-center gap-2">
                             <svg className="w-6 h-6 text-[#93c572]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             Nearby Hospitals & Clinics
                         </h2>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                             Find healthcare facilities near your location
                         </p>
                     </div>
@@ -178,7 +178,7 @@ export default function NearbyHospitals() {
             {/* Hospitals List */}
             {location && hospitals.length > 0 && (
                 <div className="space-y-3">
-                    <p className="text-sm text-gray-500 px-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 px-1">
                         Found {hospitals.length} healthcare facilities within 5km
                     </p>
 
@@ -189,7 +189,7 @@ export default function NearbyHospitals() {
                                     <div className="flex items-center gap-3 mb-2">
                                         <span className="number-highlight text-sm">{index + 1}</span>
                                         <div>
-                                            <h3 className="font-medium text-gray-800">{hospital.name}</h3>
+                                            <h3 className="font-medium text-gray-800 dark:text-white">{hospital.name}</h3>
                                             <div className="flex items-center gap-2 mt-1">
                                                 <span className={`badge text-xs ${hospital.type === 'Hospital' ? 'badge-info' : 'badge-neutral'}`}>
                                                     {hospital.type}
@@ -202,7 +202,7 @@ export default function NearbyHospitals() {
                                         </div>
                                     </div>
 
-                                    <div className="space-y-1 text-sm text-gray-600 ml-11">
+                                    <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400 ml-11">
                                         <p className="flex items-center gap-2">
                                             <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -243,7 +243,7 @@ export default function NearbyHospitals() {
                     <svg className="w-8 h-8 spin mx-auto mb-4 text-[#93c572]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <p className="text-gray-500">Searching for nearby hospitals...</p>
+                    <p className="text-gray-500 dark:text-gray-400">Searching for nearby hospitals...</p>
                 </div>
             )}
 
@@ -253,7 +253,7 @@ export default function NearbyHospitals() {
                     <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-gray-500">No hospitals found within 5km radius</p>
+                    <p className="text-gray-500 dark:text-gray-400">No hospitals found within 5km radius</p>
                     <button onClick={() => fetchNearbyHospitals(location.lat, location.lng)} className="btn btn-secondary mt-4">
                         Try Again
                     </button>

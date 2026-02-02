@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/nextjs';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from './context/ThemeContext';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,18 +44,34 @@ const clerkAppearance = {
   },
 };
 
+// Script to set theme before React hydrates (prevents flash)
+const themeScript = `
+  (function() {
+    try {
+      const theme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (theme === 'dark' || (!theme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  })();
+`;
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider appearance={clerkAppearance}>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="icon" href="/favicon.ico" />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta name="theme-color" content="#f8f9fa" />
+          <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         </head>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <div className="bg-animated"></div>
-          {children}
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-gray-900 transition-colors duration-300`}>
+          <ThemeProvider>
+            <div className="bg-animated"></div>
+            {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

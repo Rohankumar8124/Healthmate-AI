@@ -12,7 +12,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
     if (!data) {
         return (
             <div className="card p-10 text-center">
-                <p className="text-gray-500">No diagnosis data available</p>
+                <p className="text-gray-500 dark:text-gray-400">No diagnosis data available</p>
                 <button onClick={onBack} className="btn btn-secondary mt-4">Go Back</button>
             </div>
         );
@@ -47,7 +47,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
         <div className="space-y-6">
             {/* Header Actions */}
             <div className="flex items-center justify-between">
-                <button onClick={onBack} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors text-sm font-medium">
+                <button onClick={onBack} className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors text-sm font-medium">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
@@ -78,7 +78,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                     <div className="flex items-center gap-3">
                         <span className="text-2xl">{urgencyConfig.icon}</span>
                         <div>
-                            <p className="text-sm text-gray-500">Assessment Level</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Assessment Level</p>
                             <p className={`text-lg font-semibold capitalize ${urgencyConfig.text}`}>{data.urgencyLevel}</p>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                 </div>
 
                 {data.overallAssessment && (
-                    <p className="text-gray-700 text-sm leading-relaxed border-t border-gray-200/50 pt-4 mt-2">
+                    <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed border-t border-gray-200/50 dark:border-gray-600/50 pt-4 mt-2">
                         {data.overallAssessment}
                     </p>
                 )}
@@ -94,12 +94,12 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                 {/* Analysis Stats */}
                 <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-200/50">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Symptoms Analyzed:</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Symptoms Analyzed:</span>
                         <span className="number-highlight text-sm">{diagnosis.symptomCount || analysisDetails.symptomCount || '?'}</span>
                     </div>
                     {analysisDetails.patternsIdentified?.length > 0 && (
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Patterns Found:</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">Patterns Found:</span>
                             <div className="flex gap-1">
                                 {analysisDetails.patternsIdentified.map((p, i) => (
                                     <span key={i} className="badge badge-info text-xs capitalize">{p}</span>
@@ -109,7 +109,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                     )}
                     {analysisDetails.urgencyScore !== undefined && (
                         <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500">Severity Score:</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">Severity Score:</span>
                             <span className="number-highlight text-sm">{analysisDetails.urgencyScore}/10</span>
                         </div>
                     )}
@@ -119,22 +119,22 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
             {/* Conditions */}
             {data.possibleConditions?.length > 0 && (
                 <div className="card p-6 slide-up slide-up-delay-1">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#93c572]"></span>
                         Possible Conditions
                     </h2>
                     <div className="space-y-3">
                         {data.possibleConditions.map((condition, index) => (
-                            <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700">
                                 <div className="flex items-start justify-between gap-4 mb-2">
-                                    <h3 className="font-medium text-gray-800">{condition.name}</h3>
+                                    <h3 className="font-medium text-gray-800 dark:text-white">{condition.name}</h3>
                                     {condition.probability && (
                                         <span className={`badge ${condition.probability.toLowerCase() === 'high' ? 'badge-warning' :
-                                                condition.probability.toLowerCase() === 'medium' ? 'badge-info' : 'badge-neutral'
+                                            condition.probability.toLowerCase() === 'medium' ? 'badge-info' : 'badge-neutral'
                                             }`}>{condition.probability}</span>
                                     )}
                                 </div>
-                                <p className="text-sm text-gray-600 mb-2">{condition.description}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{condition.description}</p>
                                 {condition.matchingSymptoms?.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
                                         <span className="text-xs text-gray-400">Matching:</span>
@@ -152,7 +152,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
             {/* Medicines */}
             {data.suggestedMedicines?.length > 0 && (
                 <div className="card p-6 slide-up slide-up-delay-2">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#93c572]"></span>
                         Suggested Medicines
                     </h2>
@@ -167,7 +167,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                                             </svg>
                                         </div>
                                         <div>
-                                            <h3 className="font-medium text-gray-800 text-sm">{med.name}</h3>
+                                            <h3 className="font-medium text-gray-800 dark:text-white text-sm">{med.name}</h3>
                                             <div className="flex gap-1 mt-1">
                                                 <span className={`badge text-xs ${med.type === 'OTC' ? 'badge-success' : 'badge-warning'}`}>{med.type}</span>
                                                 {med.purpose && <span className="text-xs text-gray-400">• {med.purpose}</span>}
@@ -182,9 +182,9 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                                 </div>
 
                                 <div className="space-y-1.5 text-sm">
-                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Dosage:</span><span className="text-gray-700">{med.dosage}</span></div>
-                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Frequency:</span><span className="text-gray-700">{med.frequency}</span></div>
-                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Duration:</span><span className="text-gray-700">{med.duration}</span></div>
+                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Dosage:</span><span className="text-gray-700 dark:text-gray-300">{med.dosage}</span></div>
+                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Frequency:</span><span className="text-gray-700 dark:text-gray-300">{med.frequency}</span></div>
+                                    <div className="flex gap-2"><span className="text-gray-400 w-20">Duration:</span><span className="text-gray-700 dark:text-gray-300">{med.duration}</span></div>
                                 </div>
 
                                 {expandedMedicine === index && (
@@ -211,7 +211,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
             {/* Home Remedies */}
             {data.homeRemedies?.length > 0 && (
                 <div className="card p-6 slide-up slide-up-delay-3">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#93c572]"></span>
                         Home Remedies
                     </h2>
@@ -222,7 +222,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                                     <h3 className="font-medium text-[#5a8a3d]">{remedy.remedy}</h3>
                                     {remedy.effectiveness && <span className={`badge text-xs ${remedy.effectiveness === 'High' ? 'badge-success' : 'badge-info'}`}>{remedy.effectiveness}</span>}
                                 </div>
-                                <p className="text-sm text-gray-600">{remedy.instructions}</p>
+                                <p className="text-sm text-gray-600 dark:text-gray-400">{remedy.instructions}</p>
                             </div>
                         ))}
                     </div>
@@ -232,7 +232,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
             {/* Lifestyle */}
             {data.lifestyle?.length > 0 && (
                 <div className="card p-6 slide-up slide-up-delay-4">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#93c572]"></span>
                         Lifestyle Recommendations
                     </h2>
@@ -240,7 +240,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                         {data.lifestyle.map((item, index) => (
                             <li key={index} className="flex items-start gap-3 text-sm">
                                 <span className="number-highlight text-xs mt-0.5">{index + 1}</span>
-                                <span className="text-gray-600">{item}</span>
+                                <span className="text-gray-600 dark:text-gray-400">{item}</span>
                             </li>
                         ))}
                     </ul>
@@ -272,7 +272,7 @@ export default function DiagnosisResult({ diagnosis, onAddToSchedule, onBack }) 
                         </>
                     )}
                 </button>
-                
+
             </div>
 
             {/* Disclaimer */}

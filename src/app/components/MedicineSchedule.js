@@ -68,8 +68,8 @@ export default function MedicineSchedule({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">No Schedules Yet</h2>
-                <p className="text-gray-500">Add medicines from diagnosis to create reminders</p>
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">No Schedules Yet</h2>
+                <p className="text-gray-500 dark:text-gray-400">Add medicines from diagnosis to create reminders</p>
             </div>
         );
     }
@@ -77,9 +77,9 @@ export default function MedicineSchedule({
     return (
         <div className="space-y-6">
             <div className="card p-8 text-center">
-                <p className="text-sm text-gray-500 mb-1 uppercase tracking-wide">Current Time</p>
-                <div className="timer-display">{currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
-                <p className="text-gray-500 text-sm mb-6">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Current Time</p>
+                <div className="timer-display dark:text-white">{currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</div>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{currentTime.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
                 <div className="max-w-md mx-auto">
                     <div className="flex justify-between text-xs text-gray-400 mb-2"><span>12 AM</span><span>12 PM</span><span>12 AM</span></div>
                     <div className="progress-bar"><div className="progress-fill" style={{ width: `${getDayProgress()}%` }} /></div>
@@ -88,7 +88,7 @@ export default function MedicineSchedule({
 
             <div className="card p-6">
                 <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-lg font-semibold text-gray-800">Your Medicines</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Your Medicines</h2>
                     <span className="badge badge-neutral">{schedules.length}</span>
                 </div>
                 <div className="space-y-4">
@@ -98,10 +98,10 @@ export default function MedicineSchedule({
                                 <div onClick={() => onToggle(s.id)} className={`toggle ${s.isActive ? 'active' : ''}`} />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 flex-wrap">
-                                        <h3 className="font-medium text-gray-800">{s.medicine}</h3>
+                                        <h3 className="font-medium text-gray-800 dark:text-white">{s.medicine}</h3>
                                         {s.isActive && getNextDose(s) && <span className="badge badge-success text-xs">Next: {getNextDose(s)}</span>}
                                     </div>
-                                    <p className="text-sm text-gray-500">{s.dosage}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">{s.dosage}</p>
                                 </div>
                                 <div className="flex gap-1">
                                     <button onClick={() => setEditingSchedule(editingSchedule === s.id ? null : s.id)} className="btn btn-icon btn-ghost">
@@ -115,7 +115,7 @@ export default function MedicineSchedule({
                             <div className="flex flex-wrap gap-2 mt-4 ml-16">{s.times.map((t, i) => <div key={i} className="schedule-time">{formatTime(t)}</div>)}</div>
                             {editingSchedule === s.id && (
                                 <div className="w-full mt-4 pt-4 border-t border-gray-100 ml-16 fade-in">
-                                    <p className="text-sm text-gray-500 mb-3">Edit times:</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Edit times:</p>
                                     <div className="flex flex-wrap gap-3">{s.times.map((t, i) => <input key={i} type="time" value={t} onChange={(e) => onUpdateTime(s.id, i, e.target.value)} className="time-picker" />)}</div>
                                 </div>
                             )}
@@ -125,7 +125,7 @@ export default function MedicineSchedule({
             </div>
 
             <div className="card p-6">
-                <h2 className="text-lg font-semibold text-gray-800 mb-6">Today's Timeline</h2>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">Today's Timeline</h2>
                 <div className="relative pl-6">
                     <div className="timeline-line" />
                     <div className="space-y-5">
@@ -139,8 +139,8 @@ export default function MedicineSchedule({
                                     <div className={`flex-1 p-4 rounded-xl ${current ? 'bg-[#eef5e9] border border-[#d4e8c7]' : 'bg-gray-50 border border-gray-100'}`}>
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <p className={`font-medium ${past ? 'text-gray-400 line-through' : 'text-gray-800'}`}>{item.medicine}</p>
-                                                <p className="text-sm text-gray-500">{item.dosage}</p>
+                                                <p className={`font-medium ${past ? 'text-gray-400 line-through' : 'text-gray-800 dark:text-white'}`}>{item.medicine}</p>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">{item.dosage}</p>
                                             </div>
                                             <div className={`font-mono ${current ? 'text-[#7ab356]' : past ? 'text-gray-400' : 'text-gray-600'}`}>{formatTime(item.time)}</div>
                                         </div>

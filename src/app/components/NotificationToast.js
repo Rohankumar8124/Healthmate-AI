@@ -14,8 +14,8 @@ export default function NotificationToast({ notification, onClose }) {
         <div className={`notification-toast show ${notification.type}`}>
             {icons[notification.type] || icons.info}
             <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-800 text-sm">{notification.title}</p>
-                {notification.message && <p className="text-xs text-gray-500 truncate">{notification.message}</p>}
+                <p className="font-medium text-gray-800 dark:text-white text-sm">{notification.title}</p>
+                {notification.message && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{notification.message}</p>}
             </div>
             <button onClick={onClose} className="btn btn-icon btn-ghost p-1.5 -mr-1">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
